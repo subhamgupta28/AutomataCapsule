@@ -44,6 +44,7 @@ void sendData()
 void setup()
 {
     delay(200);
+    Serial.begin(115200);
     pinMode(LED, OUTPUT);
     pinMode(LED2, OUTPUT);
     pinMode(LED3, OUTPUT);
@@ -190,12 +191,12 @@ void loop()
     // doc["temp_c"] = String(temp.temperature, 2);
     // doc["humid_c"] = String(humidity.relative_humidity, 2);
 
-    Serial.print("Temperature: ");
-    Serial.print(temp.temperature);
-    Serial.println(" degrees C");
-    Serial.print("Pressure: ");
-    Serial.print(humidity.relative_humidity);
-    Serial.println(" RH %");
+    // Serial.print("Temperature: ");
+    // Serial.print(temp.temperature);
+    // Serial.println(" degrees C");
+    // Serial.print("Pressure: ");
+    // Serial.print(humidity.relative_humidity);
+    // Serial.println(" RH %");
 
     if (digitalRead(BUTTON1) == LOW)
     {
