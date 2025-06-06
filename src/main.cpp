@@ -5,6 +5,7 @@
 #include <SoftwareSerial.h>
 #include <Adafruit_AHTX0.h>
 #include <Wire.h>
+#include "tvoc_sensor.h"
 
 #define I2C_SDA_PIN 14 // Define your custom SDA pin
 #define I2C_SCL_PIN 13
@@ -26,7 +27,7 @@ JsonDocument doc;
 
 void action(const Action action)
 {
-    
+
     String jsonString;
     analogWrite(LED3, 100);
     analogWrite(LED4, 100);
@@ -62,6 +63,9 @@ void setup()
     {
         Serial.println("Didn't find AHT20");
     }
+    tvoc_init();                   // Initialize TVOC sensor
+    tvoc_set_device_active_mode(); // Set it to active mode
+
     automata.begin();
     // automata.addAttribute("battery_volt", "Battery", "V");
     JsonDocument doc;
@@ -74,8 +78,14 @@ void setup()
     // automata.addAttribute("temp_c", "Temp", "C", "DATA|CHART");
     // automata.addAttribute("humid_c", "Humidity", "%", "DATA|CHART");
     automata.addAttribute("battery_volt", "Battery", "V", "DATA|CHART");
+    automata.addAttribute("tvoc", "TVOC", "ppm", "DATA|MAIN");
+    automata.addAttribute("co2", "CO2", "ppm", "DATA|MAIN");
+    automata.addAttribute("ch2o", "CH2O", "ppb", "DATA|MAIN");
+    automata.addAttribute("tvocStatus", "TVOC Status", "", "DATA|AUX");
+    automata.addAttribute("co2Status", "CO2 Status", "", "DATA|AUX");
+    automata.addAttribute("ch2oStatus", "CH2O Status", "", "DATA|AUX");
 
-    automata.addAttribute("motion", "Motion", "");
+    automata.addAttribute("motion", "Motion", "", "DATA|AUX");
     automata.addAttribute("button1", "Button 1", "Push", "ACTION|MENU|BTN");
     automata.addAttribute("button2", "Button 2", "Push", "ACTION|MENU|BTN");
     analogWrite(LED2, 1);
@@ -179,6 +189,18 @@ void loop()
     sensors_event_t humidity, temp;
 
     aht.getEvent(&humidity, &temp);
+
+    TvocSensorData tvocData = tvoc_get_active_device_data();
+
+    if (tvocData.valid)
+    {
+        doc["tvoc"] = String(tvocData.tvoc, 3);
+        doc["tvocStatus"] = tvocData.tvoc_status;
+        doc["co2"] = tvocData.co2;
+        doc["co2Status"] = tvocData.co2_status;
+        doc["ch2o"] = tvocData.ch2o;
+        doc["ch2oStatus"] = tvocData.ch2o_status;
+    }
 
     float bt = ((analogRead(4) * 2 * 3.3 * 1000) / 4096) / 1000;
     doc["range"] = str;
