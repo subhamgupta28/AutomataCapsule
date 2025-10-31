@@ -14,9 +14,11 @@
 
 const char *HOST = "raspberry.local";
 int PORT = 8010;
+const char *MQTT_HOST = "raspberry.local";
+int MQTT_PORT = 1883;
 
 BH1750 lightMeter;
-Automata automata("Presence", HOST, PORT);
+Automata automata("Presence", HOST, PORT, MQTT_HOST, MQTT_PORT);
 // SoftwareSerial mySerial(3, 2);
 RadarSensor radar(Serial1);
 
@@ -350,7 +352,7 @@ void readSensor()
 }
 void loop()
 {
-    automata.loop();
+
     // readSensor();
     if (radar.update())
     {
