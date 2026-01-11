@@ -8,6 +8,8 @@
 // #include "RadarSensor.h"
 #define I2C_SDA_PIN 14 // Define your custom SDA pin
 #define I2C_SCL_PIN 13
+#define BUZZER 40
+#define TEST_PIN 46
 #define BAUD_RATE 256000
 // const char *HOST = "192.168.1.6";
 // int PORT = 8080;
@@ -17,8 +19,9 @@ int PORT = 8010;
 const char *MQTT_HOST = "raspberry.local";
 int MQTT_PORT = 1883;
 
+
 BH1750 lightMeter;
-Automata automata("Presence", HOST, PORT, MQTT_HOST, MQTT_PORT);
+Automata automata("Presence","", HOST, PORT, MQTT_HOST, 1883);
 // SoftwareSerial mySerial(3, 2);
 // RadarSensor radar(Serial1);
 
@@ -187,8 +190,10 @@ void setup()
     pinMode(LED2, OUTPUT);
     pinMode(LED3, OUTPUT);
     pinMode(LED4, OUTPUT);
+    // pinMode(BUZZER, OUTPUT);
     pinMode(BUTTON1, INPUT);
     pinMode(BUTTON2, INPUT);
+    // pinMode(TEST_PIN, INPUT_PULLUP);
     Serial1.begin(BAUD_RATE, SERIAL_8N1, 3, 2);
     // radar.begin();
     // Serial1.setRxBufferSize(64);
@@ -353,6 +358,13 @@ void readSensor()
 void loop()
 {
 
+    // if(digitalRead(BUTTON1)==LOW){
+    //     tone(BUZZER, 4000, 1000);
+    //     delay(1000);
+    // }else{
+    //     noTone(BUZZER);
+    // }
+
     // readSensor();
     // if (radar.update())
     // {
@@ -420,27 +432,27 @@ void loop()
     //     delay(100);
     // }
 
-    if (digitalRead(BUTTON1) == LOW)
-    {
-        JsonDocument doc;
-        doc["button1"] = 200;
-        doc["key"] = "button1";
-        automata.sendAction(doc);
-        analogWrite(LED4, 10);
-        delay(100);
-    }
+    // if (digitalRead(BUTTON1) == LOW)
+    // {
+    //     JsonDocument doc;
+    //     doc["button1"] = 200;
+    //     doc["key"] = "button1";
+    //     automata.sendAction(doc);
+    //     analogWrite(LED4, 10);
+    //     delay(100);
+    // }
 
-    if (digitalRead(BUTTON2) == LOW)
-    {
-        JsonDocument doc;
-        doc["button2"] = digitalRead(BUTTON2);
-        doc["key"] = "button2";
-        automata.sendAction(doc);
-        analogWrite(LED3, 10);
-        delay(100);
-    }
+    // if (digitalRead(BUTTON2) == LOW)
+    // {
+    //     JsonDocument doc;
+    //     doc["button2"] = digitalRead(BUTTON2);
+    //     doc["key"] = "button2";
+    //     automata.sendAction(doc);
+    //     analogWrite(LED3, 10);
+    //     delay(100);
+    // }
 
-    if ((millis() - start) > 1000)
+    if ((millis() - start) > 2000)
     {
         automata.sendLive(doc);
         start = millis();
