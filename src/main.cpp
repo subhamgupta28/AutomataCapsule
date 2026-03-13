@@ -13,15 +13,16 @@
 #define BAUD_RATE 256000
 // const char *HOST = "192.168.1.6";
 // int PORT = 8080;
-
+// const char *HOST = "automata.realsubhamgupta.in";
+// int PORT = 443;
 const char *HOST = "raspberry.local";
 int PORT = 8010;
-const char *MQTT_HOST = "raspberry.local";
-int MQTT_PORT = 1883;
+// const char *MQTT_HOST = "10.208.229.230";
+// int MQTT_PORT = 1883;
 
 
 BH1750 lightMeter;
-Automata automata("Presence","", HOST, PORT, MQTT_HOST, 1883);
+Automata automata("Presence","", HOST, PORT, HOST, 1883);
 // SoftwareSerial mySerial(3, 2);
 // RadarSensor radar(Serial1);
 
