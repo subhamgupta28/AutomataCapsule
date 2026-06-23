@@ -10,19 +10,24 @@
 #define I2C_SCL_PIN 13
 #define BUZZER 40
 #define TEST_PIN 46
-#define BAUD_RATE 256000
+#define BAUD_RATE 115200
+
+#define RX_PIN 43
+#define TX_PIN 44
 // const char *HOST = "192.168.1.6";
 // int PORT = 8080;
-// const char *HOST = "automata.realsubhamgupta.in";
-// int PORT = 443;
-const char *HOST = "raspberry.local";
-int PORT = 8010;
+const char *HOST = "automata.realsubhamgupta.in";
+int PORT = 443;
+
+const char *MQTT_HOST = "mqtt.realsubhamgupta.in";
+// const char *HOST = "raspberry.local";
+// int PORT = 8010;
 // const char *MQTT_HOST = "10.208.229.230";
 // int MQTT_PORT = 1883;
 
-
+// HardwareSerial mmwave(1);
 BH1750 lightMeter;
-Automata automata("Presence","", HOST, PORT, HOST, 1883);
+Automata automata("Presence", "", HOST, PORT, HOST, PORT);
 // SoftwareSerial mySerial(3, 2);
 // RadarSensor radar(Serial1);
 
@@ -195,7 +200,8 @@ void setup()
     pinMode(BUTTON1, INPUT);
     pinMode(BUTTON2, INPUT);
     // pinMode(TEST_PIN, INPUT_PULLUP);
-    Serial1.begin(BAUD_RATE, SERIAL_8N1, 3, 2);
+    Serial1.begin(BAUD_RATE, SERIAL_8N1, RX_PIN, TX_PIN);
+    //   mmwave.begin(115200, SERIAL_8N1, RX_PIN, TX_PIN);
     // radar.begin();
     // Serial1.setRxBufferSize(64);
     // Serial1.write(Multi_Target_Detection_CMD, sizeof(Multi_Target_Detection_CMD));
@@ -212,6 +218,8 @@ void setup()
     // Serial1.flush();
 
     lightMeter.begin();
+    automata.useHTTPS();
+    automata.useWSS();
     automata.begin();
     // automata.addAttribute("battery_volt", "Battery", "V");
     JsonDocument doc;
@@ -233,6 +241,7 @@ void setup()
     // automata.addAttribute("target3_angle", "T1 Angle", "Deg", "DATA|AUX");
 
     automata.addAttribute("temp", "Temp", "C", "DATA|MAIN");
+    automata.addAttribute("range", "Range", "CM", "DATA|MAIN");
     automata.addAttribute("humid", "Humidity", "%", "DATA|MAIN");
     automata.addAttribute("lux", "Light", "lx", "DATA|MAIN");
     // automata.addAttribute("temp_c", "Temp", "C", "DATA|CHART");
@@ -275,6 +284,8 @@ String readSerialData()
     // Now extract the range values
     String ranges = "";
     int rangeStartIndex = 0;
+
+    // Serial.println("Received Data: " + receivedData); // Debug print to check the received data
 
     // Find the keyword "Range" and extract the value following it
     while ((rangeStartIndex = receivedData.indexOf("Range", rangeStartIndex)) != -1)
@@ -385,7 +396,7 @@ void loop()
     //     Serial.println("mm");
     //     // Serial.println(targetDetected ? "YES" : "NO");
     // }
-    // str = readSerialData();
+    str = readSerialData();
     sensors_event_t humidity, temp;
     aht.getEvent(&humidity, &temp);
 
@@ -394,7 +405,7 @@ void loop()
     float bt = ((analogRead(4) * 2 * 3.3 * 1000) / 4096) / 1000;
 
     doc["lux"] = String(lux);
-    // doc["range"] = str;
+    doc["range"] = str;
     doc["battery_volt"] = String(bt, 2);
 
     // doc["target2_distance"] = target2_distance;
